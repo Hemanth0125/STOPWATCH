@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradient Stopwatch</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Style */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Stopwatch Container */
+    .stopwatch-container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(145deg, #f0f0f0, #cacaca);
+      position: relative;
+      width: 300px;
+    }
+
+    /* Gradient Half Circle */
+    .half-circle {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 100px;
+      background: linear-gradient(90deg, #0073e6, #f06292); /* Gradient Colors */
+      border-radius: 100px 100px 0 0;
+    }
+
+    /* Display Time */
+    .display {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Buttons Style */
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #0073e6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005bb5;
+    }
+
+    .lap-list {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .lap-list li {
+      font-size: 0.9rem;
+      padding: 5px;
+      background-color: #e0f7fa;
+      margin-bottom: 5px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Stopwatch Container -->
+  <div class="stopwatch-container">
+    <!-- Gradient Half Circle -->
+    <div class="half-circle"></div>
+    
+    <!-- Time Display -->
+    <div class="display" id="display">00:00:00</div>
+    
+    <!-- Buttons -->
+    <div class="buttons">
+      <button id="startStopBtn" onclick="startStop()">Start</button>
+      <button id="resetBtn" onclick="reset()">Reset</button>
+      <button id="lapBtn" onclick="recordLap()">Lap</button>
+    </div>
+
+    <!-- Lap Times -->
+    <ul class="lap-list" id="lapTimes"></ul>
+  </div>
+
+  <script>
+    let timer;
+    let isRunning = false;
+    let elapsedTime = 0;
+    let lapCounter = 0;
+
+    function updateDisplay() {
+      const display = document.getElementById('display');
+      const milliseconds = Math.floor(elapsedTime % 1000 / 10);
+      const seconds = Math.floor((elapsedTime / 1000) % 60);
+      const minutes = Math.floor((elapsedTime / 1000 / 60) % 60);
+
+      display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+    }
+
+    function startStop() {
+      const startStopBtn = document.getElementById('startStopBtn');
+      if (isRunning) {
+        clearInterval(timer);
+        startStopBtn.textContent = 'Start';
+      } else {
+        const startTime = Date.now() - elapsedTime;
+        timer = setInterval(() => {
+          elapsedTime = Date.now() - startTime;
+          updateDisplay();
+        }, 10);
+        startStopBtn.textContent = 'Pause';
+      }
+      isRunning = !isRunning;
+    }
+
+    function reset() {
+      clearInterval(timer);
+      isRunning = false;
+      elapsedTime = 0;
+      document.getElementById('display').textContent = '00:00:00';
+      document.getElementById('startStopBtn').textContent = 'Start';
+      document.getElementById('lapTimes').innerHTML = '';
+    }
+
+    function recordLap() {
+      if (!isRunning) return;
+      lapCounter++;
+      const lapTime = document.createElement('li');
+      lapTime.textContent = `Lap ${lapCounter}: ${document.getElementById('display').textContent}`;
+      document.getElementById('lapTimes').appendChild(lapTime);
+    }
+  </script>
+</body>
+</html>
